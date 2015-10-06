@@ -1,0 +1,16 @@
+{
+  "name": "knett-node-api",
+  "version": "1.0.0",
+  "description": "api-retrieving a users feed from knett.evita.no",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app"
+  },
+  "author": "ib.johansen.jr@gmail.com",
+  "license": "private",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "superagent": "^1.4.0"
+  }
+}
