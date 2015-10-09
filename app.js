@@ -3,12 +3,9 @@
 var Express = require('express');
 var Request = require('superagent');
 var BodyParser = require('body-parser');
-
 var isProduction = process.env.NODE_ENV === 'production';
 var ConfigBuilder = require('./config.js');
 var config = new ConfigBuilder(isProduction);
-
-var feedUrl = config.feedUrl;
 
 var allowCrossDomain = function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -28,25 +25,41 @@ var app = Express();
 app.use(allowCrossDomain);
 app.use(BodyParser.json());
 
-app.get('/feed/get', function (req, res) {
-    core.getKnettFeed(function (coreRes) {
-        res.send(JSON.parse(coreRes.text))
+app.post('/get/basic/:page', function (req, res) {
+    var user = req.body;
+    var page = req.params.page;
+    core.getKnettFeedBasic(user, page, function (coreRes) {
+        res.send(coreRes);
     });
 });
 
-app.post('/login', function (req, res) {
+app.post('/get/cookie/:page', function (req, res) {
     var cookie = req.body.cookie;
-    core.getKnettFeed(cookie, function (coreRes) {
+    var page = req.params.page;
+    core.getKnettFeedCookie(cookie, page, function (coreRes) {
         res.send(coreRes);
     });
 });
 
 var core = {
 
-    getKnettFeed: function (cookie, callback) {
+    getKnettFeedCookie: function (cookie, page, callback) {
         Request
-            .get(feedUrl)
+            .get(config[page])
             .set('Cookie', cookie)
+            .end(function (err, res) {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(res)
+                }
+            });
+    },
+    getKnettFeedBasic: function (user, page, callback) {
+        Request
+            .get(config[page])
+            .set('X-IKB-AUTH', 'Basic')
+            .auth(user.userName, user.password)
             .end(function (err, res) {
                 if (err) {
                     callback(err);
