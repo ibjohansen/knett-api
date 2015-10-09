@@ -25,6 +25,10 @@ var app = Express();
 app.use(allowCrossDomain);
 app.use(BodyParser.json());
 
+app.get('/wakeup', function (req, res) {
+    res.send('Jeg er våken! zzzzzz');
+});
+
 app.post('/get/basic/:page', function (req, res) {
     var user = req.body;
     var page = req.params.page;
